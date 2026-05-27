@@ -36,3 +36,7 @@ app.get('/api/data', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+// เพิ่มโค้ดนี้เข้าไปใน server.js เพื่อล็อกมงให้เข้าหน้าแรกแล้วเจอ index.html แน่นอน
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
