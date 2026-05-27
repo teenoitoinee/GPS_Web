@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบันทึกพิกัด GPS พนักงาน</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <h2>บันทึกข้อมูลและพิกัด GPS</h2>
+        
+        <form id="gpsForm">
+            <label>รหัสพนักงาน:</label>
+            <input type="text" id="empId" required>
+
+            <label>ตำแหน่ง:</label>
+            <input type="text" id="position" required>
+
+            <label>วันที่:</label>
+            <input type="date" id="date" required>
+
+            <label>Latitude (ละติจูด):</label>
+            <input type="text" id="lat" required placeholder="ใส่แมนนวลหรือกดปุ่มด้านล่าง">
+
+            <label>Longitude (ลองจิจูด):</label>
+            <input type="text" id="lng" required placeholder="ใส่แมนนวลหรือกดปุ่มด้านล่าง">
+
+            <button type="button" id="btnGetLocation">📍 ดึงพิกัด GPS ปัจจุบัน</button>
+            <button type="submit" id="btnSave">💾 บันทึกข้อมูล</button>
+        </form>
+
+        <button type="button" id="btnExport" class="export-btn">📥 Export เป็น CSV</button>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
