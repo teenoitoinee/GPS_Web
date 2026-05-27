@@ -1,43 +1,36 @@
 const express = require('express');
 const path = require('path');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ให้ Server อ่านข้อมูลแบบ JSON ได้
 app.use(express.json());
+
+// ให้ Server เข้าถึงไฟล์ในโฟลเดอร์ public (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ตัวแปรเก็บข้อมูลชั่วคราวใน Memory (สำหรับใช้งานเบื้องต้น)
-let database = [];
+// ตัวแปรเก็บข้อมูลชั่วคราวใน Memory (ถ้า Restart Server ข้อมูลจะรีเซ็ต)
+// *ข้อควรระวังของ Render ตัวฟรี: Server จะรีเซ็ตตัวเองถ้าระบบหลับ ทำให้ข้อมูลในอาเรย์นี้หายไป 
+// หากใช้จริงในระยะยาว แนะนำให้เชื่อมต่อ Database เช่น MongoDB หรือ PostgreSQL เพิ่มเติมครับ
+let savedData = [];
 
-// API สำหรับรับข้อมูลและบันทึก
+// API สำหรับบันทึกข้อมูล
 app.post('/api/save', (req, res) => {
-    const data = req.body;
-    data.timestamp = new Date().toISOString(); // แสตมป์เวลาจริงที่เซิร์ฟเวอร์
-    database.push(data);
-    console.log("บันทึกข้อมูลใหม่:", data);
-    res.status(200).send({ message: 'Success' });
-});
-
-// API สำหรับ Export เป็น CSV
-app.get('/api/export', (req, res) => {
-    if (database.length === 0) {
-        return res.status(404).send("ยังไม่มีข้อมูลให้ Export");
+    const { empId, position, date, latitude, longitude, type } = req.body;
+    
+    if (!empId || !position || !date || !latitude || !longitude) {
+        return res.status(400).json({ success: false, message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
     }
 
-    // สร้าง Header ของ CSV
-    const headers = "EmpID,Position,Date,Latitude,Longitude,Timestamp\n";
+    const newData = { empId, position, date, latitude, longitude, type, timestamp: new Date().toLocaleString() };
+    savedData.push(newData);
     
-    // นำข้อมูลมาต่อกัน
-    const rows = database.map(row => {
-        return `${row.empId},${row.position},${row.date},${row.lat},${row.lng},${row.timestamp}`;
-    }).join("\n");
+    res.json({ success: true, message: 'บันทึกข้อมูลสำเร็จ!', data: savedData });
+});
 
-    const csvData = headers + rows;
-
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="gps_data.csv"');
-    res.send(csvData);
+// API สำหรับดึงข้อมูลทั้งหมดไปทำ CSV
+app.get('/api/data', (req, res) => {
+    res.json(savedData);
 });
 
 app.listen(PORT, () => {
